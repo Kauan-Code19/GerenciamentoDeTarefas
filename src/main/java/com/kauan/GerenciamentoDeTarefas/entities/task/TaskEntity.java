@@ -1,11 +1,14 @@
 package com.kauan.GerenciamentoDeTarefas.entities.task;
 
+import com.kauan.GerenciamentoDeTarefas.entities.user.UserEntity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,4 +41,8 @@ public class TaskEntity {
 
     @Column(name = "status", nullable = false)
     private Status status;
+
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private UserEntity user;
 }

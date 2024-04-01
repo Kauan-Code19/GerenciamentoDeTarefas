@@ -1,16 +1,20 @@
 package com.kauan.GerenciamentoDeTarefas.entities.user;
 
+import com.kauan.GerenciamentoDeTarefas.entities.task.TaskEntity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.EqualsAndHashCode;
+
+import java.util.List;
 
 
 @AllArgsConstructor
@@ -31,4 +35,7 @@ public class UserEntity {
 
     @Column(name = "password", nullable = false)
     private String password;
+
+    @OneToMany(mappedBy = "user")
+    private List<TaskEntity> taskList;
 }
