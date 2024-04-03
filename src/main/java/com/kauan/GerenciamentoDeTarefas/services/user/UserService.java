@@ -28,4 +28,11 @@ public class UserService {
 
         return new UserDtoResponse(userEntity);
     }
+
+    @Transactional
+    public UserDtoResponse readUser(Long userId) {
+        UserEntity userEntity = userRepository.getReferenceById(userId);
+
+        return new UserDtoResponse(userEntity);
+    }
 }
