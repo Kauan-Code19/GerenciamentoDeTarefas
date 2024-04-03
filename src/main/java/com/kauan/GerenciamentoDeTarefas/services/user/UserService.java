@@ -35,4 +35,16 @@ public class UserService {
 
         return new UserDtoResponse(userEntity);
     }
+
+    @Transactional
+    public UserDtoResponse updateUser(Long userId, UserDto userDto) {
+        UserEntity userEntity = userRepository.getReferenceById(userId);
+
+        userEntity.setLogin(userDto.getLogin());
+        userEntity.setPassword(userDto.getPassword());
+
+        userEntity = userRepository.save(userEntity);
+
+        return new UserDtoResponse(userEntity);
+    }
 }
