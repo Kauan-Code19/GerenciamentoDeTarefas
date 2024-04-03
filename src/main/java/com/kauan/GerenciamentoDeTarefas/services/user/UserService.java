@@ -6,6 +6,7 @@ import com.kauan.GerenciamentoDeTarefas.entities.user.UserEntity;
 import com.kauan.GerenciamentoDeTarefas.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -29,7 +30,7 @@ public class UserService {
         return new UserDtoResponse(userEntity);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public UserDtoResponse readUser(Long userId) {
         UserEntity userEntity = userRepository.getReferenceById(userId);
 
@@ -46,5 +47,10 @@ public class UserService {
         userEntity = userRepository.save(userEntity);
 
         return new UserDtoResponse(userEntity);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
     }
 }
