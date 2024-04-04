@@ -46,4 +46,17 @@ public class TaskService {
 
         return new TaskDtoResponse(taskEntity);
     }
+
+    @Transactional
+    public TaskDtoResponse updateTask(Long userId, Long taskId, TaskDto taskDto) {
+        TaskEntity taskEntity = taskRepository.findByUserIdAndId(userId, taskId);
+
+        taskEntity.setTitle(taskDto.getTitle());
+        taskEntity.setDescription(taskDto.getDescription());
+        taskEntity.setDueData(taskDto.getDueDate());
+
+        taskEntity = taskRepository.save(taskEntity);
+
+        return new TaskDtoResponse(taskEntity);
+    }
 }
