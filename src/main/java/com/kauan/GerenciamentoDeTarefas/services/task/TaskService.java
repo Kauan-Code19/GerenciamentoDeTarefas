@@ -9,6 +9,7 @@ import com.kauan.GerenciamentoDeTarefas.repositories.TaskRepository;
 import com.kauan.GerenciamentoDeTarefas.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -58,5 +59,12 @@ public class TaskService {
         taskEntity = taskRepository.save(taskEntity);
 
         return new TaskDtoResponse(taskEntity);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public void deleteTask(Long userId, Long taskId) {
+        TaskEntity taskEntity = taskRepository.findByUserIdAndId(userId, taskId);
+
+        taskRepository.delete(taskEntity);
     }
 }
