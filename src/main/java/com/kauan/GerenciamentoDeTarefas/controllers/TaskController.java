@@ -27,4 +27,11 @@ public class TaskController {
 
         return ResponseEntity.created(uri).body(taskDtoResponse);
     }
+
+    @GetMapping("/{taskId}")
+    public ResponseEntity<TaskDtoResponse> readTask(@PathVariable Long userId, @PathVariable Long taskId) {
+        TaskDtoResponse taskDtoResponse = taskService.readTask(userId ,taskId);
+
+        return ResponseEntity.ok().body(taskDtoResponse);
+    }
 }

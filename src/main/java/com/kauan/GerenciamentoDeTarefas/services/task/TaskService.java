@@ -40,4 +40,10 @@ public class TaskService {
         return new TaskDtoResponse(taskEntity);
     }
 
+    @Transactional(readOnly = true)
+    public TaskDtoResponse readTask(Long userId, Long taskId) {
+        TaskEntity taskEntity = taskRepository.findByUserIdAndId(userId, taskId);
+
+        return new TaskDtoResponse(taskEntity);
+    }
 }
