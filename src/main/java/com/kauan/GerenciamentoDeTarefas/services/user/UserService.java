@@ -4,7 +4,9 @@ import com.kauan.GerenciamentoDeTarefas.dtos.user.UserDto;
 import com.kauan.GerenciamentoDeTarefas.dtos.user.UserDtoResponse;
 import com.kauan.GerenciamentoDeTarefas.entities.user.UserEntity;
 import com.kauan.GerenciamentoDeTarefas.repositories.UserRepository;
+import com.kauan.GerenciamentoDeTarefas.services.exceptions.DatabaseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,14 +22,18 @@ public class UserService {
 
     @Transactional
     public UserDtoResponse createUser(UserDto userDto) {
-        UserEntity userEntity = new UserEntity();
+        try {
+            UserEntity userEntity = new UserEntity();
 
-        userEntity.setLogin(userDto.getLogin());
-        userEntity.setPassword(userDto.getPassword());
+            userEntity.setLogin(userDto.getLogin());
+            userEntity.setPassword(userDto.getPassword());
 
-        userEntity = userRepository.save(userEntity);
+            userEntity = userRepository.save(userEntity);
 
-        return new UserDtoResponse(userEntity);
+            return new UserDtoResponse(userEntity);
+        }catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Falha de integridade referencial");
+        }
     }
 
     @Transactional(readOnly = true)
