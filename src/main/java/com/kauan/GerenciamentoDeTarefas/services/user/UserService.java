@@ -51,14 +51,18 @@ public class UserService {
 
     @Transactional
     public UserDtoResponse updateUser(Long userId, UserDto userDto) {
-        UserEntity userEntity = userRepository.getReferenceById(userId);
+        try {
+            UserEntity userEntity = userRepository.getReferenceById(userId);
 
-        userEntity.setLogin(userDto.getLogin());
-        userEntity.setPassword(userDto.getPassword());
+            userEntity.setLogin(userDto.getLogin());
+            userEntity.setPassword(userDto.getPassword());
 
-        userEntity = userRepository.save(userEntity);
+            userEntity = userRepository.save(userEntity);
 
-        return new UserDtoResponse(userEntity);
+            return new UserDtoResponse(userEntity);
+        }catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
