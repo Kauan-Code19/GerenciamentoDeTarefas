@@ -4,7 +4,11 @@ import com.kauan.GerenciamentoDeTarefas.dtos.user.UserDto;
 import com.kauan.GerenciamentoDeTarefas.dtos.user.UserDtoResponse;
 import com.kauan.GerenciamentoDeTarefas.entities.user.UserEntity;
 import com.kauan.GerenciamentoDeTarefas.repositories.UserRepository;
+import com.kauan.GerenciamentoDeTarefas.services.exceptions.DatabaseException;
+import com.kauan.GerenciamentoDeTarefas.services.exceptions.ResourceNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,37 +24,57 @@ public class UserService {
 
     @Transactional
     public UserDtoResponse createUser(UserDto userDto) {
-        UserEntity userEntity = new UserEntity();
+        try {
+            UserEntity userEntity = new UserEntity();
 
-        userEntity.setLogin(userDto.getLogin());
-        userEntity.setPassword(userDto.getPassword());
+            userEntity.setLogin(userDto.getLogin());
+            userEntity.setPassword(userDto.getPassword());
 
-        userEntity = userRepository.save(userEntity);
+            userEntity = userRepository.save(userEntity);
 
-        return new UserDtoResponse(userEntity);
+            return new UserDtoResponse(userEntity);
+        }catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Falha de integridade referencial");
+        }
     }
 
     @Transactional(readOnly = true)
     public UserDtoResponse readUser(Long userId) {
-        UserEntity userEntity = userRepository.getReferenceById(userId);
+        try {
+            UserEntity userEntity = userRepository.getReferenceById(userId);
 
-        return new UserDtoResponse(userEntity);
+            return new UserDtoResponse(userEntity);
+        }catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
     }
 
     @Transactional
     public UserDtoResponse updateUser(Long userId, UserDto userDto) {
-        UserEntity userEntity = userRepository.getReferenceById(userId);
+        try {
+            UserEntity userEntity = userRepository.getReferenceById(userId);
 
-        userEntity.setLogin(userDto.getLogin());
-        userEntity.setPassword(userDto.getPassword());
+            userEntity.setLogin(userDto.getLogin());
+            userEntity.setPassword(userDto.getPassword());
 
-        userEntity = userRepository.save(userEntity);
+            userEntity = userRepository.save(userEntity);
 
-        return new UserDtoResponse(userEntity);
+            return new UserDtoResponse(userEntity);
+        }catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public void deleteUser(Long userId) {
-        userRepository.deleteById(userId);
+        if (!userRepository.existsById(userId)) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
+
+        try {
+            userRepository.deleteById(userId);
+        }catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Falha de integridade referencial");
+        }
     }
 }
