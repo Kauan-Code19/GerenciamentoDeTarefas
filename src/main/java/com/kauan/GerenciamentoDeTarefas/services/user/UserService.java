@@ -5,6 +5,8 @@ import com.kauan.GerenciamentoDeTarefas.dtos.user.UserDtoResponse;
 import com.kauan.GerenciamentoDeTarefas.entities.user.UserEntity;
 import com.kauan.GerenciamentoDeTarefas.repositories.UserRepository;
 import com.kauan.GerenciamentoDeTarefas.services.exceptions.DatabaseException;
+import com.kauan.GerenciamentoDeTarefas.services.exceptions.ResourceNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -38,9 +40,13 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserDtoResponse readUser(Long userId) {
-        UserEntity userEntity = userRepository.getReferenceById(userId);
+        try {
+            UserEntity userEntity = userRepository.getReferenceById(userId);
 
-        return new UserDtoResponse(userEntity);
+            return new UserDtoResponse(userEntity);
+        }catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
     }
 
     @Transactional

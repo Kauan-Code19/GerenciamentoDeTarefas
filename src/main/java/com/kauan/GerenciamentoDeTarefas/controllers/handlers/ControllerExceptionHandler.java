@@ -2,6 +2,7 @@ package com.kauan.GerenciamentoDeTarefas.controllers.handlers;
 
 import com.kauan.GerenciamentoDeTarefas.dtos.exceptions.CustomError;
 import com.kauan.GerenciamentoDeTarefas.services.exceptions.DatabaseException;
+import com.kauan.GerenciamentoDeTarefas.services.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,5 +21,15 @@ public class ControllerExceptionHandler {
                 request.getRequestURI());
 
         return ResponseEntity.status(status).body(customError);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<CustomError> resourceNotFoundException(ResourceNotFoundException e,
+                                                                 HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+
+        CustomError err = new CustomError(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
+
+        return ResponseEntity.status(status).body(err);
     }
 }
