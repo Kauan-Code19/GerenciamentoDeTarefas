@@ -67,6 +67,14 @@ public class UserService {
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public void deleteUser(Long userId) {
-        userRepository.deleteById(userId);
+        if (!userRepository.existsById(userId)) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
+
+        try {
+            userRepository.deleteById(userId);
+        }catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Falha de integridade referencial");
+        }
     }
 }
