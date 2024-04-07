@@ -7,7 +7,10 @@ import com.kauan.GerenciamentoDeTarefas.entities.task.TaskEntity;
 import com.kauan.GerenciamentoDeTarefas.entities.user.UserEntity;
 import com.kauan.GerenciamentoDeTarefas.repositories.TaskRepository;
 import com.kauan.GerenciamentoDeTarefas.repositories.UserRepository;
+import com.kauan.GerenciamentoDeTarefas.services.exceptions.DatabaseException;
+import com.kauan.GerenciamentoDeTarefas.services.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,45 +28,61 @@ public class TaskService {
 
     @Transactional
     public TaskDtoResponse createTask(Long userId, TaskDto taskDto) {
-        TaskEntity taskEntity = new TaskEntity();
+        try {
+            TaskEntity taskEntity = new TaskEntity();
 
-        taskEntity.setTitle(taskDto.getTitle());
-        taskEntity.setDescription(taskDto.getDescription());
-        taskEntity.setDueData(taskDto.getDueDate());
-        taskEntity.setStatus(Status.PENDING);
+            taskEntity.setTitle(taskDto.getTitle());
+            taskEntity.setDescription(taskDto.getDescription());
+            taskEntity.setDueData(taskDto.getDueDate());
+            taskEntity.setStatus(Status.PENDING);
 
-        UserEntity userEntity = userRepository.getReferenceById(userId);
+            UserEntity userEntity = userRepository.getReferenceById(userId);
 
-        taskEntity.setUser(userEntity);
+            taskEntity.setUser(userEntity);
 
-        taskEntity = taskRepository.save(taskEntity);
+            taskEntity = taskRepository.save(taskEntity);
 
-        return new TaskDtoResponse(taskEntity);
+            return new TaskDtoResponse(taskEntity);
+        }catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Falha de integridade referencial");
+        }
     }
 
     @Transactional(readOnly = true)
     public TaskDtoResponse readTask(Long userId, Long taskId) {
-        TaskEntity taskEntity = taskRepository.findByUserIdAndId(userId, taskId);
+        try {
+            TaskEntity taskEntity = taskRepository.findByUserIdAndId(userId, taskId);
 
-        return new TaskDtoResponse(taskEntity);
+            return new TaskDtoResponse(taskEntity);
+        }catch (NullPointerException e) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
     }
 
     @Transactional
     public TaskDtoResponse updateTask(Long userId, Long taskId, TaskDto taskDto) {
-        TaskEntity taskEntity = taskRepository.findByUserIdAndId(userId, taskId);
+        try {
+            TaskEntity taskEntity = taskRepository.findByUserIdAndId(userId, taskId);
 
-        taskEntity.setTitle(taskDto.getTitle());
-        taskEntity.setDescription(taskDto.getDescription());
-        taskEntity.setDueData(taskDto.getDueDate());
+            taskEntity.setTitle(taskDto.getTitle());
+            taskEntity.setDescription(taskDto.getDescription());
+            taskEntity.setDueData(taskDto.getDueDate());
 
-        taskEntity = taskRepository.save(taskEntity);
+            taskEntity = taskRepository.save(taskEntity);
 
-        return new TaskDtoResponse(taskEntity);
+            return new TaskDtoResponse(taskEntity);
+        }catch (NullPointerException e) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public void deleteTask(Long userId, Long taskId) {
         TaskEntity taskEntity = taskRepository.findByUserIdAndId(userId, taskId);
+
+        if (taskEntity == null) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
 
         taskRepository.delete(taskEntity);
     }
