@@ -2,6 +2,7 @@ package com.kauan.GerenciamentoDeTarefas.services.task;
 
 import com.kauan.GerenciamentoDeTarefas.dtos.task.TaskDto;
 import com.kauan.GerenciamentoDeTarefas.dtos.task.TaskDtoResponse;
+import com.kauan.GerenciamentoDeTarefas.dtos.task.TaskStatusDto;
 import com.kauan.GerenciamentoDeTarefas.entities.task.Status;
 import com.kauan.GerenciamentoDeTarefas.entities.task.TaskEntity;
 import com.kauan.GerenciamentoDeTarefas.entities.user.UserEntity;
@@ -11,6 +12,9 @@ import com.kauan.GerenciamentoDeTarefas.services.exceptions.DatabaseException;
 import com.kauan.GerenciamentoDeTarefas.services.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,5 +89,36 @@ public class TaskService {
         }
 
         taskRepository.delete(taskEntity);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<TaskDtoResponse> listUserTasks(Long userId, Pageable pageable) {
+        Page<TaskEntity> tasksEntities = taskRepository.findAllByUserId(userId, pageable);
+
+        return tasksEntities.map(TaskDtoResponse::new);
+    }
+
+    @Transactional
+    public TaskDtoResponse updateTaskStatus(Long userId, Long taskId, TaskStatusDto taskStatusDto) {
+        try {
+            TaskEntity taskEntity = taskRepository.findByUserIdAndId(userId, taskId);
+
+            taskEntity.setStatus(taskStatusDto.status());
+
+            taskEntity = taskRepository.save(taskEntity);
+
+            return new TaskDtoResponse(taskEntity);
+        }catch (NullPointerException e) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Page<TaskDtoResponse> listTasksByStatus(Long userId, TaskStatusDto taskStatusDto,
+                                                  Pageable pageable) {
+        Page<TaskEntity> taskEntities = taskRepository.findAllByUserIdAndStatus(userId, taskStatusDto.status(),
+                pageable);
+
+        return taskEntities.map(TaskDtoResponse::new);
     }
 }
