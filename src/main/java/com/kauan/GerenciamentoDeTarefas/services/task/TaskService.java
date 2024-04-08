@@ -11,6 +11,9 @@ import com.kauan.GerenciamentoDeTarefas.services.exceptions.DatabaseException;
 import com.kauan.GerenciamentoDeTarefas.services.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,5 +88,12 @@ public class TaskService {
         }
 
         taskRepository.delete(taskEntity);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<TaskDtoResponse> listUserTasks(Long userId, Pageable pageable) {
+        Page<TaskEntity> tasksEntities = taskRepository.findAllByUserId(userId, pageable);
+
+        return tasksEntities.map(TaskDtoResponse::new);
     }
 }

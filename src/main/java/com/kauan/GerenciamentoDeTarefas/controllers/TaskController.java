@@ -5,6 +5,8 @@ import com.kauan.GerenciamentoDeTarefas.dtos.task.TaskDtoResponse;
 import com.kauan.GerenciamentoDeTarefas.services.task.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -48,5 +50,12 @@ public class TaskController {
         taskService.deleteTask(userId, taskId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<TaskDtoResponse>> listUserTasks(@PathVariable Long userId, Pageable pageable) {
+        Page<TaskDtoResponse> taskDtoResponses = taskService.listUserTasks(userId, pageable);
+
+        return ResponseEntity.ok().body(taskDtoResponses);
     }
 }
