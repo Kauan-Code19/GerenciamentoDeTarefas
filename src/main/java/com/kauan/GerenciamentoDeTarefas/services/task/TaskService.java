@@ -2,6 +2,7 @@ package com.kauan.GerenciamentoDeTarefas.services.task;
 
 import com.kauan.GerenciamentoDeTarefas.dtos.task.TaskDto;
 import com.kauan.GerenciamentoDeTarefas.dtos.task.TaskDtoResponse;
+import com.kauan.GerenciamentoDeTarefas.dtos.task.TaskStatusDto;
 import com.kauan.GerenciamentoDeTarefas.entities.task.Status;
 import com.kauan.GerenciamentoDeTarefas.entities.task.TaskEntity;
 import com.kauan.GerenciamentoDeTarefas.entities.user.UserEntity;
@@ -95,5 +96,20 @@ public class TaskService {
         Page<TaskEntity> tasksEntities = taskRepository.findAllByUserId(userId, pageable);
 
         return tasksEntities.map(TaskDtoResponse::new);
+    }
+
+    @Transactional
+    public TaskDtoResponse updateTaskStatus(Long userId, Long taskId, TaskStatusDto taskStatusDto) {
+        try {
+            TaskEntity taskEntity = taskRepository.findByUserIdAndId(userId, taskId);
+
+            taskEntity.setStatus(taskStatusDto.status());
+
+            taskEntity = taskRepository.save(taskEntity);
+
+            return new TaskDtoResponse(taskEntity);
+        }catch (NullPointerException e) {
+            throw new ResourceNotFoundException("Recurso não encontrado");
+        }
     }
 }

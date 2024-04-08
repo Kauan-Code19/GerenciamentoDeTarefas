@@ -2,6 +2,7 @@ package com.kauan.GerenciamentoDeTarefas.controllers;
 
 import com.kauan.GerenciamentoDeTarefas.dtos.task.TaskDto;
 import com.kauan.GerenciamentoDeTarefas.dtos.task.TaskDtoResponse;
+import com.kauan.GerenciamentoDeTarefas.dtos.task.TaskStatusDto;
 import com.kauan.GerenciamentoDeTarefas.services.task.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,5 +58,13 @@ public class TaskController {
         Page<TaskDtoResponse> taskDtoResponses = taskService.listUserTasks(userId, pageable);
 
         return ResponseEntity.ok().body(taskDtoResponses);
+    }
+
+    @PutMapping("/{taskId}/update-status")
+    public ResponseEntity<TaskDtoResponse> updateTask(@PathVariable Long userId, @PathVariable Long taskId,
+                                                      @RequestBody TaskStatusDto taskStatusDto) {
+        TaskDtoResponse taskDtoResponse = taskService.updateTaskStatus(userId, taskId, taskStatusDto);
+
+        return ResponseEntity.ok(taskDtoResponse);
     }
 }
