@@ -112,4 +112,13 @@ public class TaskService {
             throw new ResourceNotFoundException("Recurso não encontrado");
         }
     }
+
+    @Transactional(readOnly = true)
+    public Page<TaskDtoResponse> listTasksByStatus(Long userId, TaskStatusDto taskStatusDto,
+                                                  Pageable pageable) {
+        Page<TaskEntity> taskEntities = taskRepository.findAllByUserIdAndStatus(userId, taskStatusDto.status(),
+                pageable);
+
+        return taskEntities.map(TaskDtoResponse::new);
+    }
 }

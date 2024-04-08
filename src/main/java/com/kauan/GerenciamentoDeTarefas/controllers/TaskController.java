@@ -67,4 +67,14 @@ public class TaskController {
 
         return ResponseEntity.ok(taskDtoResponse);
     }
+
+    @GetMapping("/filter-by-status")
+    public ResponseEntity<Page<TaskDtoResponse>> listTasksByStatus(@PathVariable Long userId,
+                                                                  @RequestBody TaskStatusDto taskStatusDto,
+                                                                   Pageable pageable)
+    {
+        Page<TaskDtoResponse> taskDtoResponses = taskService.listTasksByStatus(userId, taskStatusDto, pageable);
+
+        return ResponseEntity.ok().body(taskDtoResponses);
+    }
 }
