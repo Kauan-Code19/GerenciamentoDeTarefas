@@ -20,13 +20,13 @@ public class LoginService {
     }
 
     @Transactional(readOnly = true)
-    public UserDtoResponse singIn(UserDto userDto) {
-        try {
-            UserEntity userEntity = userRepository.findByLoginAndPassword(userDto.getLogin(), userDto.getPassword());
+    public UserDtoResponse signIn(UserDto userDto) {
+        UserEntity userEntity = userRepository.findByLoginAndPassword(userDto.getLogin(), userDto.getPassword());
 
-            return new UserDtoResponse(userEntity);
-        }catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException("Recurso não encontrado");
+        if (userEntity == null) {
+            throw new ResourceNotFoundException("Usuário não encontrado");
         }
+
+        return new UserDtoResponse(userEntity);
     }
 }
