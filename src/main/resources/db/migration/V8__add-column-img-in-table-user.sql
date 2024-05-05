@@ -1,0 +1,2 @@
+ALTER TABLE "user"
+ADD COLUMN user_img VARCHAR(255) NOT NULL DEFAULT 'Unknown';;
