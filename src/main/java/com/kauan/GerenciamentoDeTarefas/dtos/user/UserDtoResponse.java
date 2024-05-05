@@ -8,10 +8,12 @@ import lombok.NoArgsConstructor;
 @Getter
 public class UserDtoResponse {
     private Long id;
+    private String name;
     private String login;
 
     public UserDtoResponse(UserEntity userEntity) {
         id = userEntity.getId();
+        name = userEntity.getName();
         login = userEntity.getLogin();
     }
 }

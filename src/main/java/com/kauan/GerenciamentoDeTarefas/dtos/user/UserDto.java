@@ -1,6 +1,7 @@
 package com.kauan.GerenciamentoDeTarefas.dtos.user;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -9,6 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class UserDto {
+    @NotBlank
+    private String name;
+
     @Email
     private String login;
 

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -27,6 +29,7 @@ public class UserService {
         try {
             UserEntity userEntity = new UserEntity();
 
+            userEntity.setName(userDto.getName());
             userEntity.setLogin(userDto.getLogin());
             userEntity.setPassword(userDto.getPassword());
 
@@ -54,8 +57,14 @@ public class UserService {
         try {
             UserEntity userEntity = userRepository.getReferenceById(userId);
 
-            userEntity.setLogin(userDto.getLogin());
+            userEntity.setName(userDto.getName());
             userEntity.setPassword(userDto.getPassword());
+
+            if (!Objects.equals(userDto.getLogin(), userEntity.getLogin())) {
+                throw new DatabaseException("Falha de integridade referencial");
+            }
+
+            userEntity.setLogin(userDto.getLogin());
 
             userEntity = userRepository.save(userEntity);
 
