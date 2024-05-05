@@ -39,6 +39,9 @@ public class UserEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "user_img", nullable = false)
+    private String img;
+
     @OneToMany(mappedBy = "user")
     private List<TaskEntity> taskList;
 }
