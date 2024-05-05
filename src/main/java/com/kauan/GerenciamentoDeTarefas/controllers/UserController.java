@@ -26,7 +26,7 @@ public class UserController {
 
         return ResponseEntity.created(uri).body(userDtoResponse);
     }
-
+ 
     @GetMapping("/{userId}")
     public ResponseEntity<UserDtoResponse> readUser(@PathVariable Long userId) {
         UserDtoResponse userDtoResponse = userService.readUser(userId);
